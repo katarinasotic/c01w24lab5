@@ -89,22 +89,22 @@ A lot of the visualization for this lab will be shown through GitHub Desktop, bu
    const SERVER_URL = "http://localhost:4000";
 
    test("/getAllNotes - Return list of zero for getAllNotes", async () => {
-     const notes = await fetch(`${SERVER_URL}/getAllNotes`, {
+     const notesRes = await fetch(`${SERVER_URL}/getAllNotes`, {
        method: "GET",
        headers: {
          "Content-Type": "application/json",
        },
-     })
-       .then((res) => res.json())
-       .then((data) => {
-         return data.response;
-       });
+     });
 
+     const notesBody = await notesRes.json();
+     const notes = notesBody.response;
+
+     expect(notesRes.status).toBe(200);
      expect(notes.length).toBe(0);
    });
    ```
 
-   This is similar to how our frontend would handle a response from our backend, using `fetch` to ping the backend, but we will instead use the response to verify that the `notes` array is of the right length gives no notes are in the database.
+   This is similar to how our frontend would handle a response from our backend, using `fetch` to ping the backend, but we will instead use the response to verify that a) the API returns the right response and b) the `notes` array is of the right length given no notes are in the database.
    Run `npm test` again, and verify the code works:
 
    ````
@@ -126,6 +126,7 @@ A lot of the visualization for this lab will be shown through GitHub Desktop, bu
 
 6. Go back to GitHub, and click on the `Actions` tab. We will set up our first workflow for automating code testing using Node.js and the Jest test suite we have developed so far. Search for `Node.js` on the search bar, and click `Configure` on the workflow provided by GitHub Actions.
    ![](/images/5.png)
+
    This leads to a Node.js workflow template.
    Before breaking down each component of this template, it is **_heavily encouraged_** to read the [About workflows](https://docs.github.com/en/actions/using-workflows/about-workflows) page from GitHub Actions to understand workflow basics (up until the end of `Understanding the workflow file`).
    The breakdown proceeds as follows:
@@ -133,6 +134,7 @@ A lot of the visualization for this lab will be shown through GitHub Desktop, bu
    We can press `Commit changes...` on the top right to add the YAML file to our repository (commiting directly to the `main` branch).
    If we go to the `Actions` tab again, we can see that our workflow was ran once, with three different jobs that have _failed._ This is normal, as our workflow has not been configured correctly. We will fix this soon, but you are free to explore the steps that were ran during the process.
    ![](/images/6.png)
+
 7. Go to the `Settings` tab, then under `Rules` click `Ruleset`. [Rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets) help you to control how people can interact with branches and tags in a repository. We will set up rules that prevent direct commits to our main branch, such that pull requests that pass certain workflow jobs will be required to make any changes.
    Configure a ruleset with the following settings:
 
@@ -188,7 +190,7 @@ A lot of the visualization for this lab will be shown through GitHub Desktop, bu
    Given this new branch, go back to GitHub and open up a pull request.
    You may catch a glimpse of the above workflow being prepared.
    ![](image.png)
-   The name of the job matches the status check outlined in our ruleset, a job that _must be successful_ if the PR is to be merged to main.
+   The name of the job matches the status check outlined in our ruleset, a job that _must be successful_ if the PR is to be merged to `main`.
    However, this job is set to fail: our basic arithmetic + array check test passes, but our backend test will crash given _our backend is not running in the GitHub Actions virtual machine._ Your first task for this lab is to fix that.
    ![](/images/8.png)
 
@@ -219,7 +221,7 @@ Finish the task by merging the pull request, and deleting the `fix/workflow-chan
     Once in this branch, add the following code to your `status200.test.js` file:
 
     ```javascript
-    test("/getAllNotes - Return list of two for getAllNotes", async () => {
+    test("/getAllNotes - Return list of two notes for getAllNotes", async () => {
       // Code here
       expect(false).toBe(true);
     });
@@ -229,22 +231,32 @@ Finish the task by merging the pull request, and deleting the `fix/workflow-chan
       expect(false).toBe(true);
     });
 
-    test("/editNote - Patch with content and title", async () => {
+    test("/patchNote - Patch with content and title", async () => {
       // Code here
       expect(false).toBe(true);
     });
 
-    test("/editNote - Patch with content and title", async () => {
+    test("/patchNote - Patch with just title", async () => {
       // Code here
       expect(false).toBe(true);
     });
 
-    test("/editNote - Patch with just title", async () => {
+    test("/patchNote - Patch with just content", async () => {
       // Code here
       expect(false).toBe(true);
     });
 
-    test("/editNote - Patch with just content", async () => {
+    test("/deleteAllNotes - Delete one note.", async () => {
+      // Code here
+      expect(false).toBe(true);
+    });
+
+    test("/deleteAllNotes - Delete three notes.", async () => {
+      // Code here
+      expect(false).toBe(true);
+    });
+
+    test("/updateNoteColor - Update color of a note to red (#FF0000)", async () => {
       // Code here
       expect(false).toBe(true);
     });
@@ -258,11 +270,12 @@ Finish the task by merging the pull request, and deleting the `fix/workflow-chan
 ### Task #2: Fix test coverage
 
 The tests outlined have yet to be completed for proper coverage.
-You are responsible for completing the tests such that they check for an appropriate response from all endpoints. At the minimum, they should check for a `200` status when successful. Use `npm test` for running your tests locally.
+You are responsible for completing the tests such that they check for an appropriate response from all endpoints. At the minimum, they should all check for a `200` status when successful. Use `npm test` for running your tests locally.
 
 - You may have more than one `expect` matcher (or other types of matchers) to satisfy the condition(s) required by the test.
 - Remember each test is supposed to be independent. There should be no need to have information from one test affect another.
-- You may find that one of these tests actually showcases erroneous code present in our backend. You may fix it after finding it within this PR.
+- Most of these test cases allow for checking both the status and the right body response (e.g. `[number of notes] notes deleted.`). It is encouraged you cover this in your test cases too.
+- You may find that one of these tests actually highlights erroneous code present in our backend. You may fix it after finding it within this PR.
 
 ---
 
