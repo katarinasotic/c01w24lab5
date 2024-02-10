@@ -88,29 +88,35 @@ A lot of the visualization for this lab will be shown through GitHub Desktop, bu
    ```javascript
    const SERVER_URL = "http://localhost:4000";
 
-   test("/getAllNotes - Return list of zero for getAllNotes", async () => {
-     const notesRes = await fetch(`${SERVER_URL}/getAllNotes`, {
-       method: "GET",
+   test("/postNote - Post a note", async () => {
+     const title = "NoteTitleTest";
+     const content = "NoteTitleContent";
+
+     const postNoteRes = await fetch(`${SERVER_URL}/postNote`, {
+       method: "POST",
        headers: {
          "Content-Type": "application/json",
        },
+       body: JSON.stringify({
+         title: title,
+         content: content,
+       }),
      });
 
-     const notesBody = await notesRes.json();
-     const notes = notesBody.response;
+     const postNoteBody = await postNoteRes.json();
 
-     expect(notesRes.status).toBe(200);
-     expect(notes.length).toBe(0);
+     expect(postNoteRes.status).toBe(200);
+     expect(postNoteBody.response).toBe("Note added succesfully.");
    });
    ```
 
-   This is similar to how our frontend would handle a response from our backend, using `fetch` to ping the backend, but we will instead use the response to verify that a) the API returns the right response and b) the `notes` array is of the right length given no notes are in the database.
+   This is similar to how our frontend would handle a response from our backend, using `fetch` to ping the backend, but we will instead use the response to verify that a) the API returns the right status code and b) the response string is correct.
    Run `npm test` again, and verify the code works:
 
    ````
     PASS  tests/status200.test.js
     √ 1+2=3, empty array is empty (4 ms)
-    √ /getAllNotes - Return list of zero for getAllNotes (113 ms)
+    √ /postNote - Post a note (113 ms)
 
     Test Suites: 1 passed, 1 total
     Tests:       2 passed, 2 total
@@ -127,13 +133,15 @@ A lot of the visualization for this lab will be shown through GitHub Desktop, bu
 6. Go back to GitHub, and click on the `Actions` tab. We will set up our first workflow for automating code testing using Node.js and the Jest test suite we have developed so far. Search for `Node.js` on the search bar, and click `Configure` on the workflow provided by GitHub Actions.
    ![](/images/5.png)
 
-   This leads to a Node.js workflow template.
-   Before breaking down each component of this template, it is **_heavily encouraged_** to read the [About workflows](https://docs.github.com/en/actions/using-workflows/about-workflows) page from GitHub Actions to understand workflow basics (up until the end of `Understanding the workflow file`).
-   The breakdown proceeds as follows:
-   **_[Add breakdown here]_**
-   We can press `Commit changes...` on the top right to add the YAML file to our repository (commiting directly to the `main` branch).
-   If we go to the `Actions` tab again, we can see that our workflow was ran once, with three different jobs that have _failed._ This is normal, as our workflow has not been configured correctly. We will fix this soon, but you are free to explore the steps that were ran during the process.
-   ![](/images/6.png)
+This leads to a Node.js workflow template.
+Before breaking down each component of this template, it is **_heavily encouraged_** to read the [About workflows](https://docs.github.com/en/actions/using-workflows/about-workflows) page from GitHub Actions to understand workflow basics (up until the end of `Understanding the workflow file`).
+
+The breakdown proceeds as follows:
+**_[Add breakdown here]_**
+We can press `Commit changes...` on the top right to add the YAML file to our repository (commiting directly to the `main` branch).
+If we go to the `Actions` tab again, we can see that our workflow was ran once, with three different jobs that have _failed._
+This is normal, as our workflow has not been configured correctly. We will fix this soon, but you are free to explore the steps that were ran during the process.
+![](/images/6.png)
 
 7. Go to the `Settings` tab, then under `Rules` click `Ruleset`. [Rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets) help you to control how people can interact with branches and tags in a repository. We will set up rules that prevent direct commits to our main branch, such that pull requests that pass certain workflow jobs will be required to make any changes.
    Configure a ruleset with the following settings:
@@ -185,14 +193,14 @@ A lot of the visualization for this lab will be shown through GitHub Desktop, bu
        - run: npm test
    ```
 
-   **_[Add small breakdown here]_**
-   Commit the changes, and publish the branch.
-   Given this new branch, go back to GitHub and open up a pull request.
-   You may catch a glimpse of the above workflow being prepared.
-   ![](image.png)
-   The name of the job matches the status check outlined in our ruleset, a job that _must be successful_ if the PR is to be merged to `main`.
-   However, this job is set to fail: our basic arithmetic + array check test passes, but our backend test will crash given _our backend is not running in the GitHub Actions virtual machine._ Your first task for this lab is to fix that.
-   ![](/images/8.png)
+**_[Add small breakdown here]_**
+Commit the changes, and publish the branch.
+Given this new branch, go back to GitHub and open up a pull request.
+You may catch a glimpse of the above workflow being prepared.
+![](image.png)
+The name of the job matches the status check outlined in our ruleset, a job that _must be successful_ if the PR is to be merged to `main`.
+However, this job is set to fail: our basic arithmetic + array check test passes, but our backend test will crash given _our backend is not running in the GitHub Actions virtual machine._ Your first task for this lab is to fix that.
+![](/images/8.png)
 
 ---
 
@@ -221,6 +229,11 @@ Finish the task by merging the pull request, and deleting the `fix/workflow-chan
     Once in this branch, add the following code to your `status200.test.js` file:
 
     ```javascript
+    test("/getAllNotes - Return list of zero notes for getAllNotes", async () => {
+      // Code here
+      expect(false).toBe(true);
+    });
+
     test("/getAllNotes - Return list of two notes for getAllNotes", async () => {
       // Code here
       expect(false).toBe(true);
@@ -246,12 +259,12 @@ Finish the task by merging the pull request, and deleting the `fix/workflow-chan
       expect(false).toBe(true);
     });
 
-    test("/deleteAllNotes - Delete one note.", async () => {
+    test("/deleteAllNotes - Delete one note", async () => {
       // Code here
       expect(false).toBe(true);
     });
 
-    test("/deleteAllNotes - Delete three notes.", async () => {
+    test("/deleteAllNotes - Delete three notes", async () => {
       // Code here
       expect(false).toBe(true);
     });
@@ -274,9 +287,11 @@ You are responsible for completing the tests such that they check for an appropr
 
 - You may have more than one `expect` matcher (or other types of matchers) to satisfy the condition(s) required by the test.
 - Remember each test is supposed to be independent. There should be no need to have information from one test affect another.
-- Most of these test cases allow for checking both the status and the right body response (e.g. `[number of notes] notes deleted.`). It is encouraged you cover this in your test cases too.
-- You may find that one of these tests actually highlights erroneous code present in our backend. You may fix it after finding it within this PR.
+- All of these test cases allow for checking both the status and the right body response (e.g. `[number of notes] notes deleted.`). It is encouraged to check both of these for this lab.
+- As you develop, you may find that one or more tests actually highlight erroneous code present in our backend. You may fix it after finding it within this PR.
 
 ---
 
 After completing the above, commit and push your changes. The automated tests should now pass, and the `Merge pull request` button should be green instead of gray. Do not actually merge the PR at the end.
+![](/images/10.png)
+Your lab is now complete and ready for submission.
