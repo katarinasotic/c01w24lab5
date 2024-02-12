@@ -211,8 +211,8 @@ This is normal, as our workflow has not been configured correctly. We will fix t
        - uses: actions/checkout@v3
 
        - name: Use Node.js ${{ matrix.node-version }}
-           uses: actions/setup-node@v4
-           with:
+         uses: actions/setup-node@v4
+         with:
            node-version: ${{ matrix.node-version }}
 
        - run: npm i
