@@ -83,7 +83,7 @@ A lot of the visualization for this lab will be shown through GitHub Desktop, bu
    ```
 
 5. From here, we will make use of our backend to run a test on an endpoint. On another terminal, get a local MongoDB instance and get our `server.js` file running (as shown in [previous labs](https://github.com/ArmandoRJr/c01w24lab3?tab=readme-ov-file#db)). Please ensure that the database is clean (i.e. there are no notes)!
-   Afterwards, we can append the following code to our file:
+   Afterwards, we can append the following code to our `status200.test.js` file:
 
    ```javascript
    const SERVER_URL = "http://localhost:4000";
