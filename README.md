@@ -185,39 +185,38 @@ This is normal, as our workflow has not been configured correctly. We will fix t
 
 8. `git fetch` and `git pull` the changes made to the remote repository into your local repository. From the `main` branch, make and checkout into a new branch named `fix/workflow-changes`. Replace the code inside the `.github/workflows/node.js.yml` file with the following starter code:
 
-   ```yaml
-   name: Node.js CI
+```yaml
+  name: Node.js CI
 
-   on:
-   push:
-       branches: ["main"]
-   pull_request:
-       branches: ["main", "dev"]
+  on:
+    push:
+        branches: ["main"]
+    pull_request: 
+          branches: ["main", "dev"]
 
-   jobs:
-   build:
-       name: Backend test
-       runs-on: ubuntu-latest
+  jobs:
+      build:
+          name: Backend test
+          runs-on: ubuntu-latest
 
-       defaults:
-       run:
-           working-directory: ./quirknotes/backend
+          defaults:
+              run:
+                  working-directory: ./quirknotes/backend
 
-       strategy:
-       matrix:
-           node-version: [20.x]
+          strategy:
+              matrix:
+                  node-version: [20.x]
 
-       steps:
-       - uses: actions/checkout@v3
+          steps:
+              - uses: actions/checkout@v3
 
-       - name: Use Node.js ${{ matrix.node-version }}
-         uses: actions/setup-node@v4
-         with:
-           node-version: ${{ matrix.node-version }}
-
-       - run: npm i
-       - run: npm test
-   ```
+              - name: Use Node.js ${{ matrix.node-version }}
+                uses: actions/setup-node@v3
+                with:
+                  node-version: ${{ matrix.node-version }}
+              - run: npm i
+              - run: npm test
+```
 
 **Here's a small breakdown**:
   - Changed **Pull Request** trigger to run the workflow on pull requests targeting the `main` or  `dev` branches.
